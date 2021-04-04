@@ -1,18 +1,44 @@
 import PropTypes from 'prop-types';
 import ContactsListItem from '../ContactsListItem';
 import ContactsFinderInput from '../ContactsFinderInput';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
+import Loader from 'react-loader-spinner';
+import { getContacts, getFilterValue, getLoading } from '../../redux/selectors';
 
-const ContactsList = ({ title, contacts }) => {
+const ContactsList = ({ title }) => {
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(getFilterValue);
+  const isLoading = useSelector(getLoading);
+
+  const getVisibleContacts = (allContacts, value) => {
+    const normalizedFilter = value.toLowerCase();
+    return allContacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter),
+    );
+  };
+
+  const filteredContacts = getVisibleContacts(contacts, filter);
+
   return (
     <div>
       <h2 className="header">{title}</h2>
       <ContactsFinderInput />
-      <ul>
-        {contacts.map(({ name, id, number }) => (
-          <ContactsListItem name={name} number={number} key={id} id={id} />
-        ))}
-      </ul>
+
+      {isLoading ? (
+        <Loader
+          type="TailSpin"
+          color="#000"
+          height={60}
+          width={60}
+          timeout={1000}
+        />
+      ) : (
+        <ul>
+          {filteredContacts.map(({ name, id, number }) => (
+            <ContactsListItem name={name} number={number} key={id} id={id} />
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
@@ -22,16 +48,4 @@ ContactsList.propTypes = {
   contacts: PropTypes.arrayOf(PropTypes.object),
 };
 
-const getVisibleContacts = (allContacts, filter) => {
-  const normalizedFilter = filter.toLowerCase();
-
-  return allContacts.filter(contact =>
-    contact.name.toLowerCase().includes(normalizedFilter),
-  );
-};
-
-const mapStateToProps = ({ contacts: { items, filter } }) => ({
-  contacts: getVisibleContacts(items, filter),
-});
-
-export default connect(mapStateToProps)(ContactsList);
+export default ContactsList;

@@ -1,0 +1,29 @@
+{
+  "contacts": [
+    {
+      "name": "Martin",
+      "id": 1,
+      "number": "234-54-32"
+    },
+    {
+      "name": "Loco",
+      "id": 2,
+      "number": "425-33-86"
+    },
+    {
+      "name": "Enrique",
+      "id": 3,
+      "number": "363-32-99"
+    },
+    {
+      "name": "Maksym",
+      "id": "28f8d6cb-fbbd-4338-86f7-767697744baa",
+      "number": "999-33-33"
+    },
+    {
+      "name": "etey",
+      "id": "36759765-681a-4f7c-83d3-03aa5162e60b",
+      "number": "999-33-34"
+    }
+  ]
+}

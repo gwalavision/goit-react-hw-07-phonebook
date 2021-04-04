@@ -1,7 +1,12 @@
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { filterContacts } from '../../redux/actions';
+import { getFilterValue } from '../../redux/selectors';
 
-const ContactsFinderInput = ({ value, onChange }) => {
+const ContactsFinderInput = () => {
+  const dispatch = useDispatch();
+  const value = useSelector(getFilterValue);
+  const onChange = e => dispatch(filterContacts(e.target.value));
+
   return (
     <form>
       <label>
@@ -12,15 +17,4 @@ const ContactsFinderInput = ({ value, onChange }) => {
   );
 };
 
-const mapStateToProps = state => ({
-  value: state.contacts.filter,
-});
-
-const mapDispatchToProps = dispatch => ({
-  onChange: e => dispatch(filterContacts(e.target.value)),
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(ContactsFinderInput);
+export default ContactsFinderInput;

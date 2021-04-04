@@ -1,22 +1,15 @@
 import { useEffect } from 'react';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import ContactsInput from './components/ContactsInput';
 import ContactsList from './components/ContactsList';
-import { localStorageContacts } from './redux/actions';
+import { fetchContacts } from './redux/operations';
 
-function App({ contacts, loadfromLocalStorage }) {
-  // componentDidMount
+function App() {
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    const parsedContacts = JSON.parse(localStorage.getItem('contacts'));
-    if (parsedContacts) {
-      loadfromLocalStorage(parsedContacts);
-    }
+    dispatch(fetchContacts());
   }, []);
-
-  // componentDidUpdate
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
 
   return (
     <>
@@ -26,12 +19,4 @@ function App({ contacts, loadfromLocalStorage }) {
   );
 }
 
-const mapStateToProps = state => ({
-  contacts: state.contacts.items,
-});
-
-const mapDispatchToProps = dispatch => ({
-  loadfromLocalStorage: arr => dispatch(localStorageContacts(arr)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;

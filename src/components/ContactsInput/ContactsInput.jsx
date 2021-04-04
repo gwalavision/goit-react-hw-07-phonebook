@@ -1,35 +1,53 @@
 import PropTypes from 'prop-types';
 import { v4 as uuid4 } from 'uuid';
-import { useState } from 'react';
-import { connect } from 'react-redux';
-import { addContact } from '../../redux/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from '../../redux/operations';
+import { setNameQueryInput, setNumberQueryInput } from '../../redux/actions';
+import {
+  getContacts,
+  getNameQuery,
+  getNumberQuery,
+} from '../../redux/selectors';
+import React from 'react';
 
-const ContactsInput = ({ title, contacts, onSubmit }) => {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+const ContactsInput = ({ title }) => {
+  const queryName = useSelector(getNameQuery);
+  const queryNumber = useSelector(getNumberQuery);
+  const contacts = useSelector(getContacts);
+  const dispatch = useDispatch();
 
   const handleInputChange = e => {
     const { name, value } = e.target;
-    name === 'name' ? setName(value) : setNumber(value);
+    name === 'name'
+      ? dispatch(setNameQueryInput(value))
+      : dispatch(setNumberQueryInput(value));
   };
 
   const handleSubmit = e => {
     e.preventDefault();
 
     if (contacts.length > 0) {
-      const existedContact = contacts.find(contact => contact.name === name);
+      const existedContact = contacts.find(
+        contact => contact.name === queryName,
+      );
+      const existedNumber = contacts.find(
+        contact => contact.number === queryNumber,
+      );
       if (existedContact) {
-        return alert(`${name} is already in contacts`);
+        return alert(`${queryName} is already in contacts`);
+      } else if (existedNumber) {
+        return alert(`${queryNumber} is assigned to another user`);
       }
     }
-
     const newContact = {
-      name,
+      name: queryName,
       id: uuid4(),
-      number,
+      number: queryNumber,
     };
 
-    onSubmit(newContact);
+    dispatch(addContact(newContact));
+    dispatch(setNameQueryInput(''));
+    dispatch(setNumberQueryInput(''));
   };
 
   return (
@@ -42,7 +60,7 @@ const ContactsInput = ({ title, contacts, onSubmit }) => {
             type="text"
             name="name"
             required
-            value={name}
+            value={queryName}
             onChange={handleInputChange}
           />
         </label>
@@ -52,7 +70,7 @@ const ContactsInput = ({ title, contacts, onSubmit }) => {
             type="tel"
             name="number"
             required
-            value={number}
+            value={queryNumber}
             onChange={handleInputChange}
           />
         </label>
@@ -72,12 +90,4 @@ ContactsInput.propTypes = {
   title: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = state => ({
-  contacts: state.contacts.items,
-});
-
-const mapDispatchToProps = dispatch => ({
-  onSubmit: text => dispatch(addContact(text)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(ContactsInput);
+export default React.memo(ContactsInput);
